@@ -1,0 +1,26 @@
+{
+  "include": [
+    "controller"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "venv"
+  ],
+  "reportMissingImports": "warning",
+  "reportMissingTypeStubs": false,
+  "pythonVersion": "3.9",
+  "pythonPlatform": "Linux",
+  "executionEnvironments": [
+    {
+      "root": "controller",
+      "pythonVersion": "3.9",
+      "extraPaths": ["controller"]
+    },
+    {
+      "root": "pico_firmware",
+      "pythonVersion": "3.4",
+      "extraPaths": []
+    }
+  ]
+}
