@@ -1,0 +1,36 @@
+{
+  "pool_url": "stratum+tcp://pool.example.com:3333",
+  "username": "your_bitcoin_wallet_address",
+  "password": "x",
+  "mining_mode": "test",
+  
+  "worker_settings": {
+    "auto_discover": true,
+    "expected_workers": 12,
+    "workers_per_bank": 4,
+    "number_of_banks": 3,
+    "reconnect_timeout": 10,
+    "communication_baudrate": 115200,
+    "bank_names": ["Bank-A", "Bank-B", "Bank-C"]
+  },
+  
+  "mining_settings": {
+    "work_timeout": 30,
+    "result_collection_timeout": 5.0,
+    "difficulty_adjustment": "auto",
+    "distribute_by_bank": true
+  },
+  
+  "dashboard_settings": {
+    "update_interval": 30,
+    "enable_web_dashboard": false,
+    "web_dashboard_port": 8080,
+    "group_by_bank": true
+  },
+  
+  "logging": {
+    "level": "INFO",
+    "file": "mining.log",
+    "console": true
+  }
+}
