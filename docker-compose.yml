@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  miner-controller:
+    build: .
+    image: pi-bitcoin-miner:latest
+    container_name: pi-miner-controller
+    environment:
+      - MINING_MODE=test
+      - LOG_LEVEL=INFO
+      - EXPECTED_WORKERS=4
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+      - ./controller:/app/controller:ro
+    networks:
+      - miner-network
+    restart: unless-stopped
+    
+  # Future: Web dashboard service
+  # dashboard:
+  #   build: 
+  #     context: .
+  #     dockerfile: Dockerfile.dashboard
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - miner-controller
+  #   networks:
+  #     - miner-network
+
+networks:
+  miner-network:
+    driver: bridge
+
+volumes:
+  logs:
+  config:
