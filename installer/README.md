@@ -85,6 +85,209 @@ Or install dependencies first:
 sudo apt-get install -f
 ```
 
+### Raspberry Pi 4 Setup (Recommended Method)
+
+The Pi 4 is the primary controller for the mining operation. For most users,
+we recommend using the automated setup script rather than building an
+installer package.
+
+#### Hardware Requirements
+
+- **Raspberry Pi 4** (4GB+ RAM recommended)
+- **Raspberry Pi OS** (64-bit recommended)
+- **12x Raspberry Pi Pico** boards (or 4-20 workers)
+- **Powered USB Hubs** (one per bank of 4 Picos)
+- **Stable internet connection**
+- **microSD card** (32GB+ recommended)
+
+#### Hardware Connection
+
+Connect your hardware in banks:
+```text
+[Pi 4 USB Port 1] → [USB Hub A] → [Pico 0,1,2,3] (Bank A)
+[Pi 4 USB Port 2] → [USB Hub B] → [Pico 4,5,6,7] (Bank B)
+[Pi 4 USB Port 3] → [USB Hub C] → [Pico 8,9,10,11] (Bank C)
+```
+
+**Important**: Use powered USB hubs to ensure stable power delivery to all
+Pico boards.
+
+#### Quick Setup on Raspberry Pi 4
+
+1. **Install Raspberry Pi OS**
+   - Use Raspberry Pi Imager to flash OS to microSD card
+   - Enable SSH during imaging (recommended)
+   - Boot the Pi 4
+
+2. **Clone the Repository**
+   ```bash
+   git clone https://github.com/yourusername/pi-bitcoin-miner.git
+   cd pi-bitcoin-miner
+   ```
+
+3. **Run Automated Setup**
+   ```bash
+   chmod +x scripts/setup_pi4.sh
+   ./scripts/setup_pi4.sh
+   ```
+
+   The script will:
+   - Update system packages
+   - Install Python 3 and dependencies
+   - Create a virtual environment
+   - Install all required Python packages
+   - Set up directory structure
+   - Create configuration template
+
+4. **Configure Mining Settings**
+
+   Edit the configuration file:
+   ```bash
+   nano config/mining_config.json
+   ```
+
+   Key settings for multi-bank setup:
+   ```json
+   {
+     "worker_settings": {
+       "expected_workers": 12,
+       "workers_per_bank": 4,
+       "number_of_banks": 3,
+       "reconnect_delay": 5
+     },
+     "pool": {
+       "url": "stratum+tcp://pool.example.com:3333",
+       "worker_name": "worker1",
+       "password": "x"
+     }
+   }
+   ```
+
+   - Set `expected_workers` to your total number of Picos
+   - Set `number_of_banks` based on your USB hub setup (1-5)
+   - Configure pool details for real mining
+   - Use `"MINING_MODE": "test"` for testing
+
+5. **Flash Pico Firmware**
+
+   Before starting mining, flash MicroPython firmware to each Pico:
+   ```bash
+   # See pico_firmware/README.md for detailed instructions
+   ./scripts/flash_pico.sh
+   ```
+
+   Or manually:
+   - Hold BOOTSEL button on Pico while connecting USB
+   - Copy `.uf2` firmware file to mounted drive
+   - Pico will reboot automatically
+   - Repeat for all Picos
+
+6. **Start Mining**
+   ```bash
+   ./scripts/start_mining.sh
+   ```
+
+   Or activate the environment and run directly:
+   ```bash
+   source venv/bin/activate
+   python3 controller/main.py
+   ```
+
+#### Pi 4 System Recommendations
+
+For optimal performance on Raspberry Pi 4:
+
+1. **Enable SSH** for remote management:
+   ```bash
+   sudo raspi-config
+   # Navigate to Interface Options → SSH → Enable
+   ```
+
+2. **Set Static IP** for reliable network access:
+   ```bash
+   sudo nano /etc/dhcpcd.conf
+   # Add:
+   # interface eth0
+   # static ip_address=192.168.1.100/24
+   # static routers=192.168.1.1
+   # static domain_name_servers=8.8.8.8
+   ```
+
+3. **Increase USB Power** if using many devices:
+   ```bash
+   sudo nano /boot/config.txt
+   # Add:
+   # max_usb_current=1
+   ```
+
+4. **Setup Auto-Start** on boot:
+   ```bash
+   sudo nano /etc/systemd/system/bitcoin-miner.service
+   ```
+
+   Add:
+   ```ini
+   [Unit]
+   Description=Pi Bitcoin Miner
+   After=network.target
+
+   [Service]
+   Type=simple
+   User=pi
+   WorkingDirectory=/home/pi/pi-bitcoin-miner
+   ExecStart=/home/pi/pi-bitcoin-miner/venv/bin/python3 controller/main.py
+   Restart=on-failure
+   RestartSec=10
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+   Enable the service:
+   ```bash
+   sudo systemctl daemon-reload
+   sudo systemctl enable bitcoin-miner.service
+   sudo systemctl start bitcoin-miner.service
+   ```
+
+5. **Monitor Performance**:
+   ```bash
+   # View logs
+   tail -f logs/mining.log
+
+   # Check service status
+   sudo systemctl status bitcoin-miner
+
+   # Monitor system resources
+   htop
+   ```
+
+#### Troubleshooting Pi 4 Setup
+
+**Picos not detected:**
+- Check USB connections and powered hub status
+- Run `lsusb` to verify Picos are visible
+- Try different USB ports
+- Ensure MicroPython firmware is flashed
+
+**Permission errors:**
+- Add user to dialout group: `sudo usermod -a -G dialout $USER`
+- Log out and back in for changes to take effect
+
+**Import errors:**
+- Ensure virtual environment is activated: `source venv/bin/activate`
+- Reinstall packages: `pip install -r requirements.txt`
+
+**Network connectivity issues:**
+- Check internet connection: `ping 8.8.8.8`
+- Verify pool URL in configuration
+- Check firewall settings: `sudo ufw status`
+
+For more detailed setup information, see:
+- `../docs/SETUP.md` - Complete setup guide
+- `../docs/QUICKSTART.md` - Quick start guide
+- `../docs/MULTI_BANK_SETUP.md` - Multi-bank configuration
+
 ## Customization
 
 ### Changing Version Number
