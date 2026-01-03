@@ -1,0 +1,22 @@
+WELCOME TO PI BITCOIN MINER INSTALLER
+=====================================
+
+This installer will install Pi Bitcoin Miner on your computer.
+
+IMPORTANT NOTES:
+- This is an educational project for learning purposes only
+- The mining performance will be extremely low compared to commercial miners
+- You will need Raspberry Pi hardware to actually mine (Pi 4 + Pico boards)
+- Please read the documentation after installation for setup instructions
+
+HARDWARE REQUIREMENTS:
+- Raspberry Pi 4 Model B (Controller)
+- One or more Raspberry Pi Pico boards (Mining Workers)
+- Powered USB hubs to connect the Pico boards
+
+BEFORE YOU CONTINUE:
+1. Make sure you have the required hardware
+2. Review the documentation at: https://github.com/yourusername/pi-bitcoin-miner
+3. Configure your mining pool settings after installation
+
+Click Next to continue with the installation.
